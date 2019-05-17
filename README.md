@@ -6,6 +6,8 @@ This repository contains a number of tools and custom code for use with the auto
 
 This custom code monitors charging of Hyundai Kona Electric ( and compatible ) cars and sends alerts to a telegram account.
 
+![Charge status](/images/charge_status.png)
+
 To use with autopi :
 
 1. If you don't already have a telegram token and chat id, follow instructions at https://www.mariansauter.de/2018/01/send-telegram-notifications-to-your-mobile-from-python-opensesame/
@@ -17,7 +19,7 @@ To use with autopi :
    1. change the name to **my_charge_status**
    1. delete existing code
    1. paste the code copied from step 2 above
-   1. add your telegram bot_token and bot_chatId from setp 1 above
+   1. add your telegram bot_token and bot_chatId from step 1 above
    1. Click on **Create**.
 1. Navigate to https://my.autopi.io/#/jobs
    1. click on **Create**
@@ -41,7 +43,7 @@ This custom code forwards SMS messages from the autopi dongle to a telegram acco
    1. change the name to **my_forward_sms**
    1. delete existing code
    1. paste the code copied from step 2 above
-   1. add your telegram bot_token and bot_chatId from setp 1 above
+   1. add your telegram bot_token and bot_chatId from step 1 above
    1. Click on **Create**.
 1. Navigate to https://my.autopi.io/#/jobs
    1. click on **Create**
@@ -70,7 +72,7 @@ This custom code reports telemetry data from Hyundai Kona Electric ( and compati
    1. click on **Create**
    1. change the name to **my_abrp**
    1. delete existing code
-   1. paste the code copied from step 2 above
+   1. paste the code copied from step 3 above
    1. add your abrt_token and abrt_apikey from step 1&2 above
    1. Click on **Create**.
 1. Navigate to https://my.autopi.io/#/jobs
