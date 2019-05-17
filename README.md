@@ -60,8 +60,7 @@ This custom code reports telemetry data from Hyundai Kona Electric ( and compati
 
 ![abrp](/images/abrp.png)
 
-1. If you don't already have a abrt api key, email contact@iternio.com
-1. Note your ABRT token ( ie email address )
+1. Note your ABRP token ( ie email address )
    1. Navigate to https://abetterrouteplanner.com/
    1. Show Settings
    1. Show More Settings
@@ -75,11 +74,11 @@ This custom code reports telemetry data from Hyundai Kona Electric ( and compati
    1. change the name to **my_abrp**
    1. delete existing code
    1. paste the code copied from step 3 above
-   1. add your abrt_token and abrt_apikey from step 1&2 above
+   1. add your abrp_token from step 1 above
    1. Click on **Create**.
 1. Navigate to https://my.autopi.io/#/jobs
    1. click on **Create**
-   1. change the name to **ABRT Telemetry**
+   1. change the name to **ABRP Telemetry**
    1. tick **Enabled**
    1. set **Cron Schedule** to 2,12,22,32,42,52 * * * *
    1. set **Function** to **my_abrp.telemetry**
