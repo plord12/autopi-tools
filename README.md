@@ -58,6 +58,8 @@ This custom code forwards SMS messages from the autopi dongle to a telegram acco
 
 This custom code reports telemetry data from Hyundai Kona Electric ( and compatible ) cars to a better route planner ( https://abetterrouteplanner.com/ ).
 
+![abrp](/images/abrp.png)
+
 1. If you don't already have a abrt api key, email contact@iternio.com
 1. Note your ABRT token ( ie email address )
    1. Navigate to https://abetterrouteplanner.com/
