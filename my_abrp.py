@@ -14,13 +14,11 @@ log = logging.getLogger(__name__)
 #   Live Car Connection Setup
 #   Next until User Email Address is shown - copy that here 
 #
-abrt_token = 'your token'
+abrp_token = 'your token'
 
 # ABRP API KEY
 #
-# See contact@iternio.com
-#
-abrt_apikey = 'your api key'
+abrp_apikey = '6f6a554f-d8c8-4c72-8914-d5895f58b1eb'
 
 def telemetry():
     """
@@ -91,7 +89,7 @@ def telemetry():
     data['batt_temp'] = get_batterytemp()
     log.info ('batt_temp = '+str(data['batt_temp']))
 
-    params = {'token': abrt_token, 'api_key': abrt_apikey, 'tlm': json.dumps(data, separators=(',',':'))}
+    params = {'token': abrp_token, 'api_key': abrp_apikey, 'tlm': json.dumps(data, separators=(',',':'))}
 
     log.info ('https://api.iternio.com/1/tlm/send?'+urllib.urlencode(params))  
 
