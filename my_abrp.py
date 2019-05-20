@@ -56,8 +56,8 @@ def telemetry():
     data['is_charging'] = get_charging()
     log.info ('is_charging = '+str(data['is_charging']))
 
-    # car_model - String like:chevy:bolt:17:60:other determining what car the user has connected
-    data['car_model'] = 'hyundai:kona:17:64:other'
+    # car_model - for list see https://api.iternio.com/1/tlm/get_carmodels_list?api_key=6f6a554f-d8c8-4c72-8914-d5895f58b1eb
+    data['car_model'] = 'hyundai:kona:19:64:other'
 
     # optional
 
