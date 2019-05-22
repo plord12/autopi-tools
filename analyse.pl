@@ -349,7 +349,14 @@ while (my $row = <FILE>) {
 
 			if ($pid eq "2103") {
 				if ($line =~ /^7ED21/) {
-					$spacedline = "OBC ".$spacedline." [AC Current=".(($a*256+$b)/100)."] [?=".$c."] [?=".$d."] [?=".$e."] [?=".$f."] [?=".$g."]";
+					$type="";
+					if (($c&0x20) == 0x00) {
+						$type="DC";
+					} elsif (($c&0x08) == 0x00) {
+						$type="AC";
+					}
+
+					$spacedline = "OBC ".$spacedline." [AC Current=".(($a*256+$b)/100)."] [type=".$type."] [?=".$d."] [?=".$e."] [?=".$f."] [?=".$g."]";
 				}
 				if ($line =~ /^7ED22/) {
 					$spacedline = "OBC ".$spacedline." [?=".$a."] [?=".$b."] [?=".$c."] [?=".$d."] [?=".$e."] [?=".$f."] [?=".$g."]";
