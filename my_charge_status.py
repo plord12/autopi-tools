@@ -33,13 +33,13 @@ wltp = 279
 # list of non-stanard chargers
 #
 chargers = [ 
-        {'latitude':0, 'longitude':0, 'msg':'At home, '+'5p/KWh overnight'}
+        {'latitude':51.4226469833, 'longitude':-0.855934466667, 'msg':'At home, '+'5p/KWh overnight'}
      ]
 
 """
 Poll to see if car is being charged.  If so :
 
-1. Disable auto sleep whilst charging
+1. Disable auto sleep whilst charging or driving
 2. Send Telegram message when charging starts
     - Estimated miles per kWh ( based on miles travelled and delta Accumulative Charge Power )
     - Estimaed CO2 saved on fuel since last charged ( based on ICE emissions and electricity supplier )
@@ -50,7 +50,6 @@ Poll to see if car is being charged.  If so :
 5. Send Telegram message when charging stops
 """
 def poll():
-
     # enable sleep in case anything goes wrong below
     #
     enable_sleep()
@@ -62,6 +61,12 @@ def poll():
     # check if we are driving or charging
     #
     driving = get_driving()
+
+    # disable sleep if driving or charging
+    #
+    if driving == 1 or driving == 0:
+        disable_sleep()
+
     if driving == 1 or driving == -1:
         if persistance['charging'] == True:
             if persistance['soc'] >= 99:
@@ -69,6 +74,7 @@ def poll():
             bot_sendtext('Charging *stopped*. Last known State of charge *'+format(persistance['soc'],'.1f')+'%* ('+format(wltp*persistance['soc']/100, '.1f')+' miles) charged '+format(persistance['cec']-persistance['start_cec'],'.1f')+'kWh')
             persistance['charging'] = False
             save(persistance)
+        log.info('End charging poll: Not charging')
         return {'msg': 'Not charging'}
 
     batt_power = get_charging_power()
@@ -76,11 +82,11 @@ def poll():
     # avoid fake charging
     #
     if batt_power <= 0:
+        enable_sleep()
         return {'msg': 'Not charging - power less than zero'}
 
     # now we are charging
     #
-    disable_sleep()
     soc = get_soc()
     cec = get_cec()
 
@@ -102,7 +108,6 @@ def poll():
         bot_sendtext('*'+format(odo*ice_emissions/1000000,'.2f')+'tonnes* CO2 saved in total')  
         bot_sendtext(nearest_charger()) 
         bot_sendtext('Charging *started* at a rate of '+format(batt_power,'.2f')+'kW. State of charge now *'+format(soc,'.1f')+'%* ('+format(wltp*soc/100, '.1f')+' miles)')
-
 
     # each 10% alaert
     #
