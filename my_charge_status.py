@@ -48,6 +48,9 @@ Poll to see if car is being charged.  If so :
     - Estimated range ( based on WLTP )
 3. Send Telegram message when charging reaches each 10%
 5. Send Telegram message when charging stops
+
+Use my_charge_status.delete on upgrades.
+
 """
 def poll():
     # enable sleep in case anything goes wrong below
