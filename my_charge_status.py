@@ -70,6 +70,12 @@ def poll():
     if driving == 1 or driving == 0:
         disable_sleep()
 
+    # check to see if car left locked
+    #
+    locked = get_locked()
+    if locked == 0 and driving != 1:
+        bot_sendtext('*Car unlocked*')
+
     if driving == 1 or driving == -1:
         if persistance['charging'] == True:
             if persistance['soc'] >= 99:
@@ -162,7 +168,7 @@ def dump():
 # check if we are driving.  Returns :
 #   0 - charging
 #   1 - driving
-#   -1 - can't read data
+#  -1 - can't read data
 def get_driving():
     try:
         args = ['driving']
@@ -192,7 +198,7 @@ def get_charging_power():
         'pid': '101',
         'header': '7E4',
         'baudrate': 500000,
-        'formula': '(twos_comp(bytes_to_int(message.data[13:14])*256+bytes_to_int(message.data[14:15]),16)/10.0)*((bytes_to_int(message.data[15:16])*256+bytes_to_int(message.data[16:17]))/10.0)/1000.0',
+        'formula': '(twos_comp(bytes_to_int(message.data[13:15]),16)/10.0)*((bytes_to_int(message.data[15:17]))/10.0)/1000.0',
         'protocol': '6',
         'verify': False,
         'force': True,
@@ -224,7 +230,7 @@ def get_odometer():
         'pid': 'B002',
         'header': '7C6',
         'baudrate': 500000,
-        'formula': 'bytes_to_int(message.data[11:12])*16777216+bytes_to_int(message.data[12:13])*65536+bytes_to_int(message.data[13:14])*256+bytes_to_int(message.data[14:15])',
+        'formula': 'bytes_to_int(message.data[11:15])',
         'protocol': '6',
         'verify': False,
         'force': True,
@@ -240,12 +246,33 @@ def get_cec():
         'pid': '101',
         'header': '7E4',
         'baudrate': 500000,
-        'formula': '(bytes_to_int(message.data[41:42])*16777216+bytes_to_int(message.data[42:43])*65536+bytes_to_int(message.data[43:44])*256+bytes_to_int(message.data[44:45]))/10.0',
+        'formula': '(bytes_to_int(message.data[41:45]))/10.0',
         'protocol': '6',
         'verify': False,
         'force': True,
     }
     return __salt__['obd.query'](*args, **kwargs)['value']
+
+# get door locked (strickly speaking just one door .. ).  Returns :
+#   0 - unlocked
+#   1 - locked
+#  -1 - can't read data
+def get_locked():
+    try:
+        args = ['locked']
+        kwargs = {
+            'mode': '22',
+            'pid': 'BC04',
+            'header': '770',
+            'baudrate': 500000,
+            'formula': 'bytes_to_int(message.data[7:8])',
+            'protocol': '6',
+            'verify': False,
+            'force': True,
+        }
+        return (int(__salt__['obd.query'](*args, **kwargs)['value'])&4)/4
+    except:
+        return -1
 
 # enable autopi sleep
 #
@@ -253,6 +280,10 @@ def enable_sleep():
     args = ['sleep']
     kwargs = {
         'enable': True,
+        'interval': 7200,
+        'period': 300,
+        'delay': 60,
+        'reason': 'charge status',
     }
     __salt__['power.sleep_timer'](**kwargs)
 
@@ -275,26 +306,29 @@ def get_location():
 # get nearest charger
 #
 def nearest_charger():
-    location = get_location()
+    try:
+        location = get_location()
 
-    for charger in chargers:
-        lat1 = radians(charger['latitude'])
-        lon1 = radians(charger['longitude'])
-        lat2 = radians(location['latitude'])
-        lon2 = radians(location['longitude'])
-        dlon = lon2 - lon1
-        dlat = lat2 - lat1
-        a = sin(dlat / 2)**2 + cos(lat1) * cos(lat2) * sin(dlon / 2)**2
-        c = 2 * atan2(sqrt(a), sqrt(1 - a))
-        dist = 6373.0 * c
+        for charger in chargers:
+            lat1 = radians(charger['latitude'])
+            lon1 = radians(charger['longitude'])
+            lat2 = radians(location['latitude'])
+            lon2 = radians(location['longitude'])
+            dlon = lon2 - lon1
+            dlat = lat2 - lat1
+            a = sin(dlat / 2)**2 + cos(lat1) * cos(lat2) * sin(dlon / 2)**2
+            c = 2 * atan2(sqrt(a), sqrt(1 - a))
+            dist = 6373.0 * c
 
-        if dist < 0.02:
-            log.info('found local charger '+charger['msg'])
-            return charger['msg']
+            if dist < 0.02:
+                log.info('found local charger '+charger['msg'])
+                return charger['msg']
 
-    log.info('https://api.openchargemap.io/v3/poi/?output=json&distance=0.1&maxresults=1&latitude='+str(location['latitude'])+'&longitude='+str(location['longitude']))
-    result = requests.get('https://api.openchargemap.io/v3/poi/?output=json&distance=0.1&maxresults=1&latitude='+str(location['latitude'])+'&longitude='+str(location['longitude']))
-    for i in result.json():
-        return i['OperatorInfo']['Title']+', '+i['AddressInfo']['Title']+', '+i['UsageCost']
+        log.info('https://api.openchargemap.io/v3/poi/?output=json&distance=0.1&maxresults=1&latitude='+str(location['latitude'])+'&longitude='+str(location['longitude']))
+        result = requests.get('https://api.openchargemap.io/v3/poi/?output=json&distance=0.1&maxresults=1&latitude='+str(location['latitude'])+'&longitude='+str(location['longitude']))
+        for i in result.json():
+            return i['OperatorInfo']['Title']+', '+i['AddressInfo']['Title']+', '+i['UsageCost']
+    except:
+        log.info('Unable to get location')
 
     return 'No local charger found'
